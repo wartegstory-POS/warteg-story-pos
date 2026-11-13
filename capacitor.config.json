@@ -1,0 +1,14 @@
+{
+  "appId": "com.wartegstory.pos",
+  "appName": "Warteg Story POS",
+  "webDir": ".build/web",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": false,
+      "appReadyTimeout": 20000,
+      "autoDeleteFailed": true,
+      "autoDeletePrevious": false
+    }
+  }
+}

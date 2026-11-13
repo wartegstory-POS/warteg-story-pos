@@ -1,0 +1,19 @@
+{
+  "name": "warteg-story-pos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Warteg Story POS Android application with controlled OTA patching",
+  "scripts": {
+    "build": "node scripts/build-web.js",
+    "cap:sync": "cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/core": "^7.4.3",
+    "@capgo/capacitor-updater": "^7.51.15"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "esbuild": "^0.25.0"
+  }
+}
