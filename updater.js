@@ -1,10 +1,7 @@
 import { CapacitorUpdater } from '@capgo/capacitor-updater';
 
-// Expose the official Capacitor plugin to the existing POS launcher updater.
 window.WartegCapacitorUpdater = CapacitorUpdater;
 
-// Capgo requires this on EVERY native app launch. Call it immediately after
-// the bundled bridge is loaded so a valid bundle is not rolled back.
 if (
   window.Capacitor &&
   window.Capacitor.isNativePlatform &&
@@ -15,29 +12,25 @@ if (
   });
 }
 
-// Base URL for Warteg Story OTA updates.
-const OTA_BASE_URL = 'https://wartegstory-pos.github.io/warteg-story-pos/';
+const OTA_BASE_URL =
+  'https://wartegstory-pos.github.io/warteg-story-pos/';
 
-// Returns the native updater instance used by the POS launcher.
-window.wsGetNativeUpdater = function wsGetNativeUpdater() {
-  if (window.WartegCapacitorUpdater) {
-    return window.WartegCapacitorUpdater;
-  }
-
-  return null;
+window.wsGetNativeUpdater = function () {
+  return window.WartegCapacitorUpdater || null;
 };
 
-// Checks GitHub Pages for a newer patch and installs it through CapacitorUpdater.
-window.wsCheckPatchUpdate = async function wsCheckPatchUpdate() {
+window.wsCheckPatchUpdate = async function () {
   const button = document.getElementById('btn-check-update');
 
   try {
     if (button) {
       button.disabled = true;
-      button.innerHTML = '<span aria-hidden="true">↻</span> MEMERIKSA…';
+      button.textContent = 'MEMERIKSA UPDATE…';
     }
 
-    window.wsStatus('Menghubungkan ke server Warteg Story untuk memeriksa patch…');
+    window.wsStatus(
+      'Menghubungkan ke server Warteg Story untuk memeriksa patch…'
+    );
 
     const updater = window.wsGetNativeUpdater();
 
@@ -47,32 +40,36 @@ window.wsCheckPatchUpdate = async function wsCheckPatchUpdate() {
       typeof updater.set !== 'function'
     ) {
       throw new Error(
-        'Fitur OTA belum tersedia. Diperlukan pembaruan APK untuk mengaktifkan updater native.'
+        'Fitur OTA belum tersedia. Perlu pembaruan APK untuk mengaktifkan updater native.'
       );
     }
 
-    const versionResponse = await fetch(
-      OTA_BASE_URL + 'version.json?t=' + Date.now(),
-      {
-        cache: 'no-store'
-      }
-    );
+    const versionUrl =
+      OTA_BASE_URL + 'version.json?t=' + Date.now();
 
-    if (!versionResponse.ok) {
+    const response = await fetch(versionUrl, {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
       throw new Error(
-        'Gagal mengambil informasi versi (HTTP ' + versionResponse.status + ').'
+        'Gagal mengambil informasi versi (HTTP ' +
+          response.status +
+          ').'
       );
     }
 
-    const versionData = await versionResponse.json();
+    const data = await response.json();
 
-    if (!versionData.version) {
-      throw new Error('Informasi versi tidak ditemukan di version.json.');
+    if (!data.version) {
+      throw new Error(
+        'Informasi versi tidak ditemukan di version.json.'
+      );
     }
 
-    const releaseVersion = String(versionData.version);
+    const releaseVersion = String(data.version);
     const patchName =
-      versionData.patch_asset || 'warteg-story-pos-patch.zip';
+      data.patch_asset || 'warteg-story-pos-patch.zip';
 
     const patchUrl =
       OTA_BASE_URL +
@@ -82,7 +79,9 @@ window.wsCheckPatchUpdate = async function wsCheckPatchUpdate() {
       encodeURIComponent(releaseVersion);
 
     window.wsStatus(
-      'Patch versi ' + releaseVersion + ' ditemukan. Mengunduh…'
+      'Patch versi ' +
+        releaseVersion +
+        ' ditemukan. Mengunduh…'
     );
 
     const bundle = await updater.download({
@@ -91,17 +90,23 @@ window.wsCheckPatchUpdate = async function wsCheckPatchUpdate() {
     });
 
     if (!bundle || !bundle.id) {
-      throw new Error('Patch terunduh tetapi ID bundle tidak diterima.');
+      throw new Error(
+        'Patch terunduh tetapi ID bundle tidak diterima.'
+      );
     }
 
-    window.wsStatus('Patch berhasil diunduh. Memasang patch…');
+    window.wsStatus(
+      'Patch berhasil diunduh. Memasang patch…'
+    );
 
-    await updater.set({ id: bundle.id });
+    await updater.set({
+      id: bundle.id
+    });
 
     window.wsStatus(
       'Patch versi ' +
         releaseVersion +
-        ' berhasil dipasang. Restart aplikasi untuk menerapkan perubahan.'
+        ' berhasil dipasang. Restart aplikasi.'
     );
   } catch (error) {
     const message =
@@ -117,5 +122,17 @@ window.wsCheckPatchUpdate = async function wsCheckPatchUpdate() {
   } finally {
     if (button) {
       button.disabled = false;
-      button.innerHTML =
-        '<span aria-hidden="true">↻</span> CEK UPDATE / P
+      button.textContent = 'CEK UPDATE / PATCH';
+    }
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  const button = document.getElementById('btn-check-update');
+
+  if (button) {
+    button.addEventListener('click', () => {
+      window.wsCheckPatchUpdate();
+    });
+  }
+});
