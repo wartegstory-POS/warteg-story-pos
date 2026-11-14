@@ -735,7 +735,11 @@ async function wsCheckUpdate(){
   const asset=(data.assets||[]).find(function(a){return a.name==='warteg-story-pos-patch.zip';});
   if(!asset||!asset.browser_download_url) throw new Error('Release '+(data.tag_name||'terbaru')+' belum memiliki lampiran warteg-story-pos-patch.zip.');
   wsStatus('Patch '+(data.tag_name||'terbaru')+' ditemukan. Mengunduh…');
-  const bundle=await updater.download({url:asset.browser_download_url,version:String(data.tag_name||data.name||Date.now())});
+  const releaseVersion=String(data.tag_name||data.name||Date.now());
+  const branch=String(data.target_commitish||'main');
+  const patchUrl='https://raw.githubusercontent.com/'+encodeURIComponent(repo.owner)+'/'+encodeURIComponent(repo.repo)+'/'+encodeURIComponent(branch)+'/updates/warteg-story-pos-patch.zip?v='+encodeURIComponent(releaseVersion);
+  wsStatus('Patch '+releaseVersion+' ditemukan. Mengunduh dari server patch…');
+  const bundle=await updater.download({url:patchUrl,version:releaseVersion});
   if(!bundle||!bundle.id) throw new Error('Patch selesai diunduh, tetapi ID bundle tidak diterima. Versi lama tetap digunakan.');
   wsStatus('Patch berhasil diunduh. Memasang patch…');
   await updater.set({id:bundle.id});

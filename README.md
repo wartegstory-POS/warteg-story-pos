@@ -9,6 +9,9 @@ GitHub Actions membuat staging sementara `.build/web` saat build, lalu Capacitor
 2. Buka Actions → Build Warteg Story POS APK → Run workflow.
 3. Build menghasilkan APK dan `warteg-story-pos-patch.zip`.
 4. Untuk menerbitkan OTA Release, naikkan `version` di `version.json`, lalu jalankan workflow manual.
-5. Di launcher aplikasi, simpan URL repository GitHub yang sama pada Pengaturan Server Update.
+5. Workflow juga menerbitkan ZIP ke `updates/warteg-story-pos-patch.zip` agar updater mengunduh dari `raw.githubusercontent.com` tanpa redirect asset Release.
+6. Di launcher aplikasi, simpan URL repository GitHub yang sama pada Pengaturan Server Update.
+
+Catatan migrasi updater: pasang APK v1.0.2 satu kali secara manual. Setelah itu, update HTML/CSS/JS berikutnya dapat memakai URL patch langsung. `notifyAppReady()` juga dipanggil pada setiap peluncuran native agar bundle valid tidak otomatis di-rollback.
 
 Catatan: `appId` saat ini diset ke `com.wartegstory.pos`. Jangan menggantinya setelah APK pertama dipasang, karena Android memakai application ID untuk mengenali update aplikasi.
