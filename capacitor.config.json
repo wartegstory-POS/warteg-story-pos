@@ -3,6 +3,13 @@
   "appName": "Warteg Story POS",
   "webDir": ".build/web",
   "bundledWebRuntime": false,
+  "server": {
+    "url": "https://wartegstory-pos.github.io/warteg-story-pos/",
+    "cleartext": false,
+    "allowNavigation": [
+      "wartegstory-pos.github.io"
+    ]
+  },
   "plugins": {
     "CapacitorUpdater": {
       "autoUpdate": false,
